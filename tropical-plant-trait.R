@@ -63,6 +63,7 @@ specificrows
 
 activity4 <-datatable[c(1:10, 12, 17, 23, 145),]
 activity4
+write.csv(activity4)
 
 activity5 <- datatable[ ,1:5]
 activity5
