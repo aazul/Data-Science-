@@ -1,0 +1,122 @@
+---
+title: "uhuru dataset"
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-10-04'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### 1. Describing the data that we are using 
+
+We are using the data set from [this study](https://esapubs.org/archive/ecol/E095/064/metadata.php)
+
+The Data From UHURU Acacia Survey is based on a study of assessing both direct and indirect consequences of the removal of nonrandom species of the environment. The UHURU consists of three wired electric fences to provoke herbivore exclusion treatments this also has a control group which is un-fenced. The units that we are using are for height meters and for weight kg. These three  Fenced treatments include "Mega" excludes elephants and giraffes only; "Meso" excludes both megaherbivores and mesoherbivores, ca. 40 kg and larger; and"Total" excludes all herbivores > 5 kg.
+
+
+
+
+### 2. reading the data table into R 
+
+
+First make sure we are in the correct working directory "getwd()"
+"/Users/atziri/Bio 195-197/Data Science"
+
+if it is not right set the working directory with 'setwd()'
+
+
+```{r}
+read.csv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
+```
+
+```{r}
+acacia <-read.csv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
+```
+
+# 3. explore our data set 
+'head()' gives us the first six rows 
+
+```{r}
+head(acacia)
+summary(acacia)
+colnames(acacia)
+```
+
+make sure that everything htat should be a numeric value is a number one way to check is the 'summary()' command 
+
+another way is using the type function 
+
+
+```{r}
+typeof(acacia [,"HEIGHT"])
+
+
+acacia$HEIGHT
+```
+
+we identifyed a column that has problematic data 
+we need to fix this 
+
+
+We are going to read the data table again, but we are going to assign 'NA' to the "dead value "that we dont want in our 
+arguments are always plain text 
+
+```{r}
+acacia <- read.csv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t", na.strings = "dead")
+```
+### 4. Visualize our data 
+
+For this we are using the 'ggplot' package. 
+lets install and load it 
+
+
+```{r}
+# install.packages("ggplot2")
+library(ggplot2)
+```
+
+Now We are going to create our first plotting 
+layer with the function 'ggplot. 
+
+```{r}
+colnames(acacia)
+acacia$CIRC
+```
+
+```{r}
+ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT )) + geom_point(size = 1, color = "blue", alpha = 0.1) + 
+  labs(x = "Circumference", y = "Height", title = "Data From UHURU Acacia Survey ")
+```
+to rescale th eplotting of the axis to log scale we use the function 'scale_y_log_10()'
+
+```{r}
+ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT )) + 
+  geom_point(size = 1, color = "purple", alpha = 0.4) + 
+  scale_x_log10() +
+  scale_y_log10()
+```
+```{r}
+acacia$TREATMENT
+```
+```{r}
+ggplot(data = acacia, mapping = aes (x = CIRC, y = HEIGHT, color = TREATMENT)) + 
+ geom_point(size = 2, alpha = 0.5 )
+```
+
+### 4.2 Visualize a statystical analysis of correlation 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
