@@ -26,14 +26,24 @@ First make sure we are in the correct working directory "getwd()"
 
 if it is not right set the working directory with 'setwd()'
 
+how do i test where the computer is ?
 
 ```{r}
 read.csv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
 ```
-
 ```{r}
-acacia <-read.csv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
+read.csv(file = "../raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
 ```
+```{r}
+r_proj_wd <- "/Users/atziri/Bio 195-197/Data Science"
+r_chunk_wd <- getwd()
+r_proj_wd == r_chunk_wd
+r_chunk_wd
+```
+```{r}
+acacia <-read.csv(file = "../raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
+```
+#The two dots represents what we need to do to go one up to the folder neded 
 
 # 3. explore our data set 
 'head()' gives us the first six rows 
@@ -42,6 +52,13 @@ acacia <-read.csv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/ACACIA
 head(acacia)
 summary(acacia)
 colnames(acacia)
+row.names(acacia)
+class(acacia$SURVEY)
+#the sapplu function all owes to apply a function to a list of objects 
+#a data frame is a list of vectors of the same lenght 
+sapply(acacia, class)
+
+
 ```
 
 make sure that everything htat should be a numeric value is a number one way to check is the 'summary()' command 
@@ -56,9 +73,11 @@ typeof(acacia [,"HEIGHT"])
 acacia$HEIGHT
 ```
 
-we identifyed a column that has problematic data 
+we identified a column that has problematic data 
 we need to fix this 
 
+## Cleaning our raw data 
+### 3.2 assign 'NA' lable to missing
 
 We are going to read the data table again, but we are going to assign 'NA' to the "dead value "that we dont want in our 
 arguments are always plain text 
@@ -84,9 +103,18 @@ layer with the function 'ggplot.
 colnames(acacia)
 acacia$CIRC
 ```
+The ggplot function creates  a blank canvas. the canvas contains our data 
+and the variables that we plot. 
 
+The aes function allows for the plugging of all lines colors and data we want to read 
+
+A scatter plot can be created with the function (geom_point)
+it can have a blank () however if you want to specidy color sixe and trasparency you add it
 ```{r}
-ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT )) + geom_point(size = 1, color = "blue", alpha = 0.1) + 
+
+```
+```{r}
+ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT )) + geom_point(size = 1, color = "blue", alpha = 0.8, shape = 11) + 
   labs(x = "Circumference", y = "Height", title = "Data From UHURU Acacia Survey ")
 ```
 to rescale th eplotting of the axis to log scale we use the function 'scale_y_log_10()'
@@ -102,11 +130,77 @@ acacia$TREATMENT
 ```
 ```{r}
 ggplot(data = acacia, mapping = aes (x = CIRC, y = HEIGHT, color = TREATMENT)) + 
- geom_point(size = 2, alpha = 0.5 )
+ geom_point() + 
+  facet_wrap(~TREATMENT)
 ```
 
 ### 4.2 Visualize a statystical analysis of correlation 
 
+# Subplots or facets 
+
+Teh function ro create subplots by a third variablr is called 'facet_wrap()'
+
+```{r}
+ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT, color = TREATMENT)) + geom_point() + 
+  facet_wrap(~TREATMENT)
+```
+the total that excludes all the hervibores has more trees than the fenced spaces with select hervivors 
+meso taller trees 
+mega longer trees 
+
+
+A little interpretation of what is going on here 
+
+How to test a Hypothesis 
+
+## Model Filling functions 
+
+The geom_smooth() function 
+
+```{r}
+ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT, color = TREATMENT, linetype  = TREATMENT)) + geom_point() + 
+ geom_smooth(methood = "loess") +
+  facet_wrap(~TREATMENT)
+```
+
+## Histograms and barplots 
+
+For bar plots use the geom_bar() function: 
+
+
+```{r}
+ggplot(data = acacia, aes(x = TREATMENT))+
+  geom_bar()
+```
+
+if you want to see the distribution of a contiuous variable we use the geom_ histogram() function:
+
+```{r}
+ggplot(data = acacia, mapping = aes(x = HEIGHT)) +
+  geom_histogram()
+```
+```{r}
+ggplot(data = acacia, mapping = aes(x = HEIGHT, color = TREATMENT)) +
+  geom_histogram(bins = 20, color = "black")
+```
+
+
+
+
+
+
+
+## layer multiple data from the same or different data sets 
+```{r}
+ggplot() +
+  geom_point(data = acacia,
+             mapping = aes(x = CIRC, y = HEIGHT, 
+                           color = TREATMENT)) +
+  geom_smooth(data = acacia, 
+              mapping = aes(x = CIRC, y = HEIGHT))
+```
+
+# 
 
 
 
@@ -120,3 +214,88 @@ ggplot(data = acacia, mapping = aes (x = CIRC, y = HEIGHT, color = TREATMENT)) +
 
 
 
+
+
+
+
+# In class exercise 
+# 1. 
+
+```{r}
+ggplot() +
+  geom_point(data = acacia,
+             mapping = aes(x = CIRC, y = AXIS1, )) +
+  labs(x = "Circumference", y =  "Canopy Diameter", title = "Data From UHURU Acacia Survey ")
+```
+# 2. 
+```{r}
+ggplot() +
+  geom_point(data = acacia,
+             mapping = aes(x = CIRC, y = AXIS1, )) +
+  labs(x = "Circumference", y =  "Canopy Diameter", title = "Data From UHURU Acacia Survey ") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+# 3. 
+```{r}
+ggplot() +
+  geom_point(data = acacia,
+             mapping = aes(x = CIRC, y = AXIS1,
+                           color = ANT)) +
+  labs(x = "Circumference", y =  "Canopy Diameter", title = "Data From UHURU Acacia Survey ")
+```
+# 4. 
+```{r}
+ggplot() +
+  geom_point(data = acacia,
+             mapping = aes(x = CIRC, y = AXIS1,
+                           color = ANT)) +
+  labs(x = "Circumference", y =  "Canopy Diameter", title = "Data From UHURU Acacia Survey ") +
+geom_point() + 
+  facet_wrap(~ANT)
+```
+5. 
+```{r}
+ggplot(data = acacia,
+             mapping = aes(x = CIRC, y = AXIS1,
+                           color = ANT)) +
+  labs(x = "Circumference", y =  "Canopy Diameter", title = "Data From UHURU Acacia Survey ") +
+geom_point() +
+  geom_smooth()+
+  facet_wrap(~ANT) 
+```
+
+
+#Exercise 2. Histograms 
+
+# 1. 
+
+```{r}
+ggplot(data = acacia, aes(x = ANT))+
+  geom_bar()
+```
+
+# 2. 
+```{r}
+ggplot(data = acacia, mapping = aes(x = HEIGHT)) +
+   labs(x = "Height (m)", y =  "Number of Acacia", title = "Data From UHURU Acacia Survey ") +
+  geom_histogram(binwidth = .20 , color = "black")
+```
+# 3. 
+
+```{r}
+ggplot() +
+  geom_histogram(data = acacia,
+             mapping = aes(x = AXIS1) , alpha = 0.3, fill = "red") +
+  geom_histogram(data = acacia, 
+              mapping = aes(x = AXIS2), alpha = 0.3, fill = "black")
+```
+# 4. 
+```{r}
+ggplot() +
+  geom_histogram(data = acacia,
+             mapping = aes(x = AXIS1) , alpha = 0.3, fill = "red") +
+  geom_histogram(data = acacia, 
+              mapping = aes(x = AXIS2), alpha = 0.3, fill = "black") +
+  facet_wrap(~ TREATMENT)
+```
