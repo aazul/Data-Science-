@@ -1,0 +1,140 @@
+---
+title: "small-mammals"
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-10-11'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+For all the data manipulation we are going to use the 'dplyr' package 
+
+to install a package we use the function install_packages()
+but to use the function inside a package we need to load them to our environment we do this with the function 'library()'
+```{r}
+library(dplyr)
+```
+
+
+#Read teh data table 
+
+```{r cars}
+#getwd()
+surveys <- read.csv(file = "../raw-data/surveys.csv")
+head(surveys)
+#View(surveys)
+plots <- read.csv(file = "../raw-data/plots.csv")
+head(plots)
+species <- read.csv(file = "../raw-data/species.csv")
+head(species)
+```
+
+# Subst a data table by columns 
+
+Using the dplyr function 'subset()':
+
+```{r}
+select(surveys, year, species_id, weight)
+surveys_short <- select(surveys, year, species_id, weight )
+head(surveys_short)
+```
+Other ways to subset a data table by columns: 
+
+```{r}
+columns2keep <- c("year", "species_id", "weight")
+surveys[,columns2keep]
+```
+## Add columns to our data 
+
+we can use the function `mutate()`
+
+Add an extra columb that has weight divided by 10 
+
+```{r}
+colnames(surveys)
+surveys$weight_decimal <- surveys$weight/10
+
+colnames(surveys)
+```
+
+we can use function `mutate()`
+```{r}
+surveys <- mutate(surveys,weight_decimal_2 =weight/10)
+```
+
+```{r}
+surveys
+```
+
+```{r}
+arrange(surveys, weight)
+```
+
+to arrange in a descending order : 
+```{r}
+arrange(surveys, desc(weight))
+```
+
+
+##Filter Data 
+
+to filter unwanted data or by some specific value in our data we use the function `filter()`
+! meand 
+```{r}
+filter(surveys, species_id == "DS")
+filter(surveys, species_id !="DS")
+```
+
+We can also filter by multiple conditions : 
+
+```{r}
+temp_table <- filter(surveys, species_id <="DS", year < 1998)
+tail(temp_table, 100)
+```
+
+the logical operator `&` `|` mean "AND" and "OR"
+```{r}
+filter(surveys, species_id == "DS" & year >= 1998)
+```
+
+```{r}
+filter(surveys, species_id == "DS" | year >= 1998)
+```
+
+lets filter for values that are NA we need the function `is.na()`
+```{r}
+is.na(surveys$weight)
+surveys$weight
+filter(surveys, is.na(weight))
+
+```
+
+```{r}
+is.na(surveys$weight)
+surveys$weight
+filter(surveys, !is.na(weight))
+```
+
+#Exercise 1: Data manipulation
+
+```{r}
+surveys <- read.csv(file = "../raw-data/surveys.csv")
+```
+```{r}
+subset1 <- select(surveys, year, month, day, species_id)
+```
+```{r}
+
+surveys_subset <- filter(surveys, !is.na(weight))
+nrow(surveys_subset)
+
+surveys_subset <- mutate(surveys_subset, weight_kg = weight/1000)
+nrow(surveys_subset)
+
+head(surveys_subset)
+surveys_subset <-select(surveys_subset, year, species_id, weight_kg)
+surveys_subset_filtered <- filter(surveys_subset, species_id == "SH")
+nrow(surveys_subset_filtered)
+```
