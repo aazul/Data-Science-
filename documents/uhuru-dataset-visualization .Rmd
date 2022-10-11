@@ -144,9 +144,9 @@ Teh function ro create subplots by a third variablr is called 'facet_wrap()'
 ggplot(data = acacia, mapping = aes(x = CIRC, y = HEIGHT, color = TREATMENT)) + geom_point() + 
   facet_wrap(~TREATMENT)
 ```
-the total that excludes all the hervibores has more trees than the fenced spaces with select hervivors 
-meso taller trees 
-mega longer trees 
+The total that excludes all the herbivores has more trees than the fenced spaces with select herbivores 
+meso has taller trees with larger circumference 
+mega has shorter trees with smaller circumference 
 
 
 A little interpretation of what is going on here 
@@ -173,20 +173,19 @@ ggplot(data = acacia, aes(x = TREATMENT))+
   geom_bar()
 ```
 
-if you want to see the distribution of a contiuous variable we use the geom_ histogram() function:
+If you want to see the distribution of a continuous variable we use the geom_ histogram() function:
 
 ```{r}
 ggplot(data = acacia, mapping = aes(x = HEIGHT)) +
   geom_histogram()
 ```
+
+The 'fill =' command gives the inside of the bar color and the 
+'color = "" ' command gives the outline color of the bars  
 ```{r}
-ggplot(data = acacia, mapping = aes(x = HEIGHT, color = TREATMENT)) +
+ggplot(data = acacia, mapping = aes(x = HEIGHT, fill = TREATMENT)) +
   geom_histogram(bins = 20, color = "black")
 ```
-
-
-
-
 
 
 
@@ -200,25 +199,15 @@ ggplot() +
               mapping = aes(x = CIRC, y = HEIGHT))
 ```
 
-# 
+# Save images as files 
+
+```{r}
+ggsave(filename = "acacia_by_treatment.pdf")
+```
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# In class exercise 
+# In class exercise 1. 
 # 1. 
 
 ```{r}
@@ -299,3 +288,138 @@ ggplot() +
               mapping = aes(x = AXIS2), alpha = 0.3, fill = "black") +
   facet_wrap(~ TREATMENT)
 ```
+
+
+ Home exercises 
+
+# Exercised 3. 
+
+#1 To installed a package use the function 'install.packages("")'
+```{r}
+#install.packages("readr")
+
+```
+function library allows me to open the directory where the package i just downloaded is stored 
+```{r}
+library(readr)
+```
+
+getting and setting my working directory 
+
+```{r}
+setwd("~/Bio 195-197/Data Science/raw-data")
+getwd()
+```
+```{r}
+read_tsv(file = "/Users/atziri/Bio 195-197/Data Science/raw-data/TREE_SURVEYS.txt")
+```
+```{r}
+read_tsv(file = "../raw-data/TREE_SURVEYS.txt")
+```
+
+#2 reading the file of the data set with function read_tsv and then assign it to the trees object 
+```{r}
+trees <- read_tsv(file = "../raw-data/TREE_SURVEYS.txt",
+                  col_types = list(HEIGHT = col_double(),
+                                AXIS_2 = col_double())) 
+```
+
+function gives me a summary of thw object trees which is now the dataset needed for the assignment 
+```{r}
+summary(trees)
+```
+
+#3
+add a new column with the command 'nameofdataframehere$newcolnamehere' then give it the command for the value we need
+the estimated canopy area calculated as the value in the AXIS_1 column times the value in the AXIS_2 column.
+```{r}
+trees$canopy_area <- trees$AXIS_1 * trees$AXIS_2
+```
+
+#4
+Subset the trees data frame with just the SURVEY, YEAR, SITE, and canopy_area columns. 
+```{r}
+subset(trees, select = c('SURVEY' , 'YEAR' , 'SITE' , 'canopy_area'))
+```
+
+#5
+creating a scatter plot using the ggplot() function. using the mapping function to add the aesthetics of the plot such as the data used for the x and y axis 
+using the 'geom_point()'function to with the command size to add a size to the plots 
+using the facet_wrap(~SPECIES ) function to create a subplot for each species. I used the function labs to add the labeling of each of the axis and the title of the graph. 
+```{r}
+ggplot(data = trees,
+       mapping = aes(x = canopy_area, y = HEIGHT, color = TREATMENT )) +
+  geom_point( size = 2) + 
+  facet_wrap(~SPECIES ) +
+ labs(x = "Canopy Area (m)", y = "Height (m)", title = "Data From Trees ")
+```
+#6 
+logical vector that evaluates all rows that are in AXIS_1 and AXIS_2 that are below 20 
+this wa to eliminate outliers all values above 20. 
+```{r}
+trees_2 <- trees$AXIS_1 <= 20 | trees$AXIS_2 <= 20 
+summary(trees_2)
+nrow(trees)
+```
+
+```{r}
+trees <- trees[trees_2, ]
+```
+
+```{r}
+ggplot(data = trees,
+       mapping = aes(x = canopy_area, y = HEIGHT, color = TREATMENT )) +
+  geom_point( size = 2) + 
+  facet_wrap(~SPECIES ) +
+ labs(x = "Canopy Area (m)", y = "Height (m)", title = "Data From Trees ")
+```
+#7 
+used the pipe symbol %>% which takes th eoutput of the function and into another function as an argument this linked a sequence of analysis steps.  
+Assignment needed to be used to the right rather than the left  
+```{r}
+library(dplyr)
+trees %>%
+group_by(YEAR, SPECIES) %>%
+  summarize(species_abundance=n()) -> abundance 
+
+
+```
+
+#8 
+Here i made a line plot with points by using the geom_line() and the  geom_point function 
+used the facet_wrap(~SPECIES, scales = "free_y") command to see each trend clearly
+```{r}
+ggplot(data = abundance,
+       mapping = aes(x = YEAR, y= species_abundance)) +
+  geom_line()+
+  geom_point()+ 
+  facet_wrap(~SPECIES, scales = "free_y")
+
+```
+Exercise 4
+Comparing  the circumference to height relationship in acacia and to the same relationship for trees in the region. This compares two data sets in a scatter plot 
+I used the geom_points() function to specify the information we need from each of both data sets 
+first are the comands of the trees data set- what we want on the back goes first 
+the geom smooth command gives the smooth line to each one of the layers in the scatter plot 
+the scale_x_log10() and  scale_y_log10() functions allow us to scale the data in the scatter plot 
+we had the issue in office hrs to get the trend lines to be straight rather than curved. 
+used the labs() functions to add labels to the scatter plot. 
+
+```{r}
+ggplot() +
+  geom_point(data = trees, 
+              mapping = aes(x = CIRC , y = HEIGHT), color = "gray") +
+  geom_smooth(data = trees, 
+              mapping = aes(x = CIRC , y = HEIGHT), color = "black") +
+   scale_x_log10() +
+  scale_y_log10()+
+  geom_point(data = acacia,
+             mapping = aes(x = CIRC , y = HEIGHT ), color= "red") +
+  geom_smooth(data = acacia,
+             mapping = aes(x = CIRC , y = HEIGHT ), color= "red") +
+   scale_x_log10() +
+  scale_y_log10()+
+  labs(x = "Circumference (cm)", y = "Height (m)", title = "Data From Acacia VS Trees ")
+  
+```
+
