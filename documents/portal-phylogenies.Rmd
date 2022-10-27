@@ -1,0 +1,128 @@
+---
+title: "portal-phylogenies.Rmd"
+author: "Azul Carrillo"
+date: "2022-10-25"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# The Newick tree format allows us to represent trees in a readable way for computers. This uses the correspondance between the trees and the nested parenthesis. In other words this format is used to describe in detail a phylogenetic tree as text. In the format the parenthesis group the sequence names. The branch lengths can be included using a colon followed by the length. Finally this is finished by a semicolon no branch length ex` (,(,,),); ` this will just add the sequence names. Ex. branch length included  ` (B:1.0,(A:2.0,C:3.0,E:4.0):5.0,D:6.0); `. 
+
+# package 'ape'
+
+```{r}
+#install.packages("ape")
+library(ape)
+```
+
+```{r}
+portal_tree <- read.tree(file = "../raw-data/portal-tree.tre")
+```
+branch length Dna- will be propotional to mutation rate by some unit of time, change in DNA per kind 
+
+```{r}
+small_tree <- read.tree(file = "http://ape-package.ird.fr/APER/APER2/primfive.tre")
+small_tree
+```
+# The structure of a tree in R 
+classes we've been working with data.frames next we will work with is phylo 
+```{r}
+class(portal_tree)
+length(portal_tree) # gives the number of 
+names(portal_tree)
+#portal_tree$Nnode
+head(portal_tree["tip.label"])
+head(portal_tree[[3]])
+summary(portal_tree)
+str(portal_tree) # $ to access elements
+head(portal_tree$edge)
+```
+list is similar to a data frame but it allows combining object of any kind 
+
+```{r}
+plot.phylo(x = portal_tree)
+```
+An extension of gg plt for phylogenetic visualization `ggtree`
+to install packages from Bioconductor repo we need a CRAN package called BiocManager
+```{r}
+#install.packages("BiocManager")
+library(BiocManager)
+install("ggtree")
+library(ggtree)
+```
+Plotting a Phylogenetic tree 
+```{r}
+ggtree(portal_tree)
+```
+
+```{r}
+#this is equivalent to 
+ggplot(portal_tree, aes(x,y)) +
+  geom_tree() +
+  theme_tree()
+```
+to add a skale  use the function geom_treescales():
+```{r}
+ggtree(portal_tree)+
+  geom_treescale()
+
+
+```
+ 
+ plot the small tree of five species of primates adn include a scale what is the difference between the portal and the small tree 
+```{r}
+ggtree(small_tree) +
+  geom_treescale()
+```
+
+```{r}
+class(small_tree)
+length(small_tree) # gives the number of 
+names(small_tree)
+small_tree$Nnode
+small_tree["tip.label"]
+head(small_tree[[3]])
+summary(small_tree)
+str(small_tree) # $ to access elements
+head(small_tree$edge)
+# for portal_tree the Number of tips: 43 Number of nodes: 345 therefor it is larger than the small trees  Number of tips: 5 Number of nodes: 4 edge is the branch small trees we have a branch length under edge.node 
+```
+
+
+```{r}
+small_tree$edge.length
+head(small_tree$node.label)
+head(portal_tree$node.label)
+```
+#Add tip labels and node labels 
+because a plo is nothing with no labels 
+```{r}
+ggtree(portal_tree) +
+  geom_treescale() +
+  geom_tiplab(size = 1, color= "purple", fontface = "italic")
+```
+add a limit to the plot so that we can see the labels 
+
+```{r}
+ggtree(portal_tree) +
+  geom_treescale() +
+  geom_tiplab(size = 1, color= "purple", fontface = "italic") +
+  xlim(NA, 90)
+```
+
+```{r}
+ggtree(small_tree) +
+  geom_treescale() +
+  geom_tiplab(size = 2, color= "purple", fontface = "italic") +
+  xlim(NA, 2)
+```
+
+```{r}
+library(ape)
+branching.times(small_tree)
+```
