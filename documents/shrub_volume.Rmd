@@ -1,0 +1,189 @@
+---
+title: "shrub-volume-dataset"
+author: "Azul Carrillo"
+date: '2022-10-17'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Exercise 1: Data wrangling basics
+
+#2. Describing the data that we are using 
+
+We are using the data set on  [this file ](https://lunasare.github.io/data-science-research-biology/data/shrub-volume-data.csv) 
+
+We are using data collected from Dr. Granger's study of the factors controlling the size and carbon storage of shrubs. Dr. Granger conducted an experiment looking at three different treatments and their effect on shrub volume at 4 different locations. The data set consists of five columns. Site, experiment, length, width and, height. 
+
+```{r echo=FALSE, out.width='100%'}
+knitr::include_graphics("/Users/atziri/Bio 195-197/Data Science/documents/shrubs Small.png")
+```
+
+# 3. reading the data table into R 
+```{r}
+getwd()
+```
+```{r}
+shrubs <-read.csv(file = "../raw-data/shrub-volume-data.csv")
+head(shrubs)
+summary(shrubs)
+```
+#4. Select the data from the “length” column and print it out. 
+First use the library() function with the `dplyr` input to be able to use the select() function then use the select function to obtatin only the length column of the dataset 
+```{r}
+library(dplyr)
+```
+
+```{r}
+select(shrubs, length)
+```
+#5. Select the data from the site and experiment columns
+```{r}
+select(shrubs, site, experiment)
+```
+#6.Add a new column named “area” containing the area of the shrub, which is the length times the width
+Added a new column 'area' the area value is length multiplied by with i did this with the mutate() function 
+
+```{r}
+shrubs <- mutate(shrubs, area = length * width)
+head(shrubs)
+```
+#7.Sort the data by length
+The function arrange will sort the data by length 
+```{r}
+arrange(shrubs, length)
+```
+#8.Filter the data to include only plants with heights greater than 5 
+The filter() function will allow me to add a limit to what i need to include in this case only plants with height greater than 5 >5
+```{r}
+filter(shrubs, height > 5 )
+```
+#9. Filter the data to include only plants with heights greater than 4 and widths greater than 2 
+to filter more than one command using the filter() function you can use a comma `,` or the `&` symbol. 
+```{r}
+filter(shrubs, height > 4 & width > 2 )
+```
+#10. Filter the data to include only plants from Experiment 1 or Experiment 3
+```{r}
+filter(shrubs, experiment == "1" | experiment == "3")
+```
+#11. Filter the data to remove rows with null values in the height column 
+the !is.na()function will eliminate andy null values therfore here it will remuve null values from the heigth column 
+```{r}
+filter(shrubs, !is.na(height))
+```
+#12. Create a new data frame called shrub_volumes that includes all of the original data and a new column containing the volumes (length * width * height), and display it.
+by using the head function it shows only the first 6 rows and all columns so to display the full dataset i used the View() function 
+```{r}
+shrub_volumes <-  mutate(shrubs, volumes = length * width * height)
+head(shrub_volumes)
+nrow(shrub_volumes)
+#View(shrub_volumes)
+```
+### Exercise 2: Data agreggation
+The following code calculates the average height of a plant at each site:
+```{r}
+shrub_dims <- read.csv("../raw-data/shrub-volume-data.csv")
+by_site <- group_by(shrub_dims, site)
+avg_height <- summarize(by_site, avg_height = mean(height))
+head(avg_height)
+```
+
+#1. Modify the code to calculate and print the average height of a plant in each experiment.
+i did this by creating a new subset by_experiment that will group the 3 experiments by number of experiment and then instead of using by_site subset in the new avg_height subset i used by_experiment. this gave me the average height of a plant in each experiment. 
+```{r}
+shrub_dims <- read.csv("../raw-data/shrub-volume-data.csv")
+by_experiment <- group_by(shrub_dims, experiment)
+avg_height <- summarize(by_experiment, avg_height = mean(height))
+head(avg_height)
+#View(avg_height)
+```
+#2. Use max() to determine the maximum height of a plant at each site.
+
+```{r}
+shrub_dims <- read.csv("../raw-data/shrub-volume-data.csv")
+by_site <- group_by(shrub_dims, site)
+max_height <- summarize(by_site, max_height = max(height))
+head(max_height)
+```
+#3. Write the same code but as a pipeline (using the pipe |> or *>*) to get the same result.
+The pipe doesn't need subsets the higher function sends the next function a command when its connected by a pipe. 
+```{r}
+read.csv("../raw-data/shrub-volume-data.csv") %>%
+  group_by(site) %>%
+  summarize(max_height = max(height)) %>%
+  head()
+```
+
+## 3. 
+# this is the original code #
+
+read.csv("shrub-volume-data.csv")
+shrub_data |>
+  mutate(volume = length * width * height) |>
+  group_by(site) |>
+  summarize(mean_volume = max(volume))
+shrub_data |>
+  mutate(volume = length * width * height)
+  group_by(experiment) |>
+  summarize(mean_volume = mean(volume))
+  
+What the pipe helps us do is send the command of the function above to the line that is attached to by the pipe. 
+
+#1. First I had to change the input of the rad.csv() function to give it direction and add the object shrubs_data 
+doing this at the start of the code and not adding a pipe allowed the code to use that object multiple times without having to read the csv every time the object needs to be used. 
+#2. i had to modify all the pipe symbols because my system is not updated 
+ used the function colnames to see the name of each column 
+```{r}
+shrub_data <- read.csv("../raw-data/shrub-volume-data.csv") #1. added the object shrubs_data 
+shrub_data %>% 
+  mutate(volume = length * width * height)  %>%
+  group_by(site) %>%
+  summarize(mean_volume = max(volume))
+colnames(shrub_data)
+ shrub_data %>%
+  mutate(volume = length * width * height)  %>%
+  group_by(experiment)  %>%
+  summarize(mean_volume = mean(volume))
+
+```
+
+homework review
+
+```{r}
+getwd()
+shrubs <-read.csv(file = "../raw-data/shrub-volume-data.csv")
+head(shrubs)
+select(shrubs, length) 
+```
+logical statements adn indicated by the & symbol or indicated by the vertical bar symbol 
+```{r}
+filter(shrubs, height > 5  & experiment == 2 )
+```
+
+ Relational statements with missing values 
+```{r}
+NA == 3 
+shrubs$height == NA
+is.na(NA)
+
+
+```
+
+Functions that summaryze values in a vector like mean, max,min, sum 
+```{r}
+mean(shrubs$height)
+max(shrubs$height)
+min(shrubs$height)
+sum(shrubs$height, na.rm = TRUE)
+```
+
+
+
+
+
+

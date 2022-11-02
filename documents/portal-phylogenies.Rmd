@@ -22,6 +22,7 @@ library(ape)
 
 ```{r}
 portal_tree <- read.tree(file = "../raw-data/portal-tree.tre")
+portal_tree
 ```
 branch length Dna- will be propotional to mutation rate by some unit of time, change in DNA per kind 
 
@@ -52,7 +53,7 @@ to install packages from Bioconductor repo we need a CRAN package called BiocMan
 ```{r}
 #install.packages("BiocManager")
 library(BiocManager)
-install("ggtree")
+#install("ggtree")
 library(ggtree)
 ```
 Plotting a Phylogenetic tree 
@@ -125,4 +126,226 @@ ggtree(small_tree) +
 ```{r}
 library(ape)
 branching.times(small_tree)
+```
+Evolution - how living things have changed (evolved)
+branches aka edges or lineages 
+node - event happened 
+roots in a tree- represent the common ancestor to all lineage in the trees 
+# creating differnt tree tepresentation 
+```{r}
+library(ggtree)
+ggtree(portal_tree, layout = "fan", open.ange = 45) -> plot1
+```
+
+```{r}
+#install.packages("aplot")
+library(aplot)
+plot_list(plot1, plot1, labels = c("Circular Tree of Portal Species", "The same "), tag_size = 7 )
+```
+
+```{r}
+plot1.<- ggtree(portal_tree, layout="rectangular")
+plot2 <-ggtree(portal_tree, layout="ape")
+plot3 <-ggtree(portal_tree, layout="roundrect")
+plot4 <-ggtree(portal_tree, layout="slanted")
+plot5 <- ggtree(portal_tree, layout="ellipse")
+plot6 <- ggtree(portal_tree, layout="dendrogram") 
+plot7 <-ggtree(portal_tree, layout="circular")
+plot8 <-ggtree(portal_tree, layout="radial")
+plot9 <- ggtree(portal_tree, layout="fan", open.angle = 90)
+plot10 <- ggtree(portal_tree, layout="equal_angle")
+plot11 <-ggtree(portal_tree, layout="daylight")
+plot12<- ggtree(portal_tree, layout="unrooted")
+```
+Part 2: 
+Create a subplot for each tree.  
+```{r}
+plot_list(plot1., plot2,plot3, plot4,plot5, plot6, plot7, plot8,plot9,plot10, plot11,plot12, tag_levels = "A")
+```
+part 3: 
+```{r}
+my_labels<-paste(letters[1:12], "=","rooted") 
+
+plot_list(plot1., plot2,plot3, plot4,plot5, plot6, plot7, plot8,plot9,plot10, plot11,plot12, labels = my_labels, tag_size=5)
+```
+j,k,l,b  un-rooted 
+taxonomy - classifies
+phylogeny - study of evolutionary relationships 
+
+```{r}
+taxonomy<- read.csv("../raw-data/portal-species-taxonomy.csv")
+```
+
+```{r}
+write.csv(taxonomy, file ="../raw-data/portal-species-taxonomy.csv", row.names = FALSE)
+nrow(taxonomy)
+View(taxonomy)
+```
+
+```{r}
+portal_tree
+```
+
+```{r}
+library(tidytree)
+library(dplyr)
+full_join(portal_tree,taxonomy, by = "label")
+head(taxonomy)
+```
+
+```{r}
+left_join(portal_tree,taxonomy, by = "label")
+#the join failed 
+#we need to check our species labels  because we had all NA values 
+head(taxonomy)
+taxonomy$label
+```
+replace the tip - labels from our original portal tree with a new vector of tip 
+```{r}
+tip_labels <-portal_tree$tip.label
+tip_labels
+tip_labels_cleaned<- gsub("_"," ",tip_labels)
+tip_labels_cleaned
+portal_tree[["tip.label"]]<-tip_labels_cleaned
+portal_tree$tip.label
+```
+
+
+```{r}
+library(tidytree)
+tree_data <- left_join(portal_tree,taxonomy, by = "label")
+tree_data
+class(tree_data)
+```
+color by a variable in our column 
+```{r}
+ggtree(tr= tree_data, mapping = aes(color= taxa))+
+  geom_tiplab(size = 2, frontface="italic")+
+  xlim(0,100)
+ggsave(filename = "../fig/portal-tree-1.png")
+
+```
+
+
+```{r}
+class(portal_tree)
+typeof(portal_tree)
+str(portal_tree)
+portal_tree
+
+```
+
+```{r}
+portal_tree <-("../raw-data/portal-tree.tre")
+```
+
+```{r}
+taxonomy <- read.csv("../raw-data/portal-species-taxonomy.csv")
+surveys <- read.csv("../raw-data/surveys.csv")
+species <- read.csv("../raw-data/species.csv")
+```
+
+```{r}
+library(ggtree)
+
+ggtree(tr= tree_data, mapping = aes(color= taxa)) +
+  geom_tiplab(size = 2.5, frontface="italic") +
+  xlim(0,100)
+
+ggsave(filename = "../fig/portal-tree-1.png")
+tree_data
+```
+```{r}
+small_tree <- read.tree(file = "http://ape-package.ird.fr/APER/APER2/primfive.tre")
+branching.times(small_tree)
+
+ggtree(small_tree) + 
+  xlim(0,1.5) +
+  geom_tiplab(fontface = "italic")
+
+label <- small_tree$tip.label
+
+taxa <- c("Hominini", "Hominidae") 
+common_name <- c("Human", "Orangutan")
+data.frame ("label", "taxa", "common_name")
+``` 
+
+```{r}
+install.packages("TDbook")
+```
+
+```{r}
+library(TDbook)
+data("tree_boots")
+data("df_tip_data")
+data("df_inode_data")
+tree_boots # 7 tips and 6 internal nodes, Rooted; includes branch lengths.
+#column "Newick_label"change to "label" in  df_ tip_ data and in df_inode_data 
+```
+
+```{r}
+renamed_tip_data <- df_tip_data %>%
+  mutate(label = Newick_label)
+colnames(renamed_tip_data )
+renamed_inode_data <- df_inode_data %>%
+  mutate(label = newick_label)
+colnames(renamed_inode_data)
+renamed_inode_data
+```
+
+```{r}
+colnames(df_tip_data)[1] <- "label"
+colnames(df_tip_data)
+colnames(df_inode_data)[1] <- "label"
+colnames(df_inode_data) 
+```
+
+```{r}
+names(tree_boots)
+colnames(df_tip_data)
+intersect (names(tree_boots), colnames(df_tip_data))
+tree_joined <- left_join(tree_boots, df_tip_data, by = "label")
+tree_joined
+```
+
+```{r}
+colnames(df_tip_data)
+df_tip_data$rank
+
+ggtree(tree_joined) +
+  geom_tippoint(mapping = aes(shape = trophic_habit, 
+                               color= trophic_habit, 
+                              size = mass_in_kg))+
+  geom_tiplab(fontface = "italic") + 
+  xlim(0,4)
+
+df_tip_data
+```
+
+```{r}
+
+library(dplyr)
+colnames(surveys)
+surveys
+surveys %>%
+  filter(!is.na(weight)) %>%
+  group_by(species_id) %>%
+  summarise(mean_weight = mean(weight)) -> species_weight
+nrow(species_weight)
+spp_weight <- inner_join(species, species_weight)
+spp_weight
+
+colnames (taxonomy) 
+taxonomy_weight<- full_join(taxonomy, spp_weight)
+taxonomy_weight
+
+library(tidytree)
+tree_join <- left_join(portal_tree, taxonomy_weight, by = "label")
+portal_tree
+
+tree_join
+ggtree(tree_join) +
+  geom_tiplab(fontface = "italic", size = 2) +
+  xlim(0, 20) +
+  geom_tippoint(mapping = aes(shape =  "circle", size = mean_weight, color = taxa))
 ```
