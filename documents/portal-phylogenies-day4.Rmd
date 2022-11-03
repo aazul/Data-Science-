@@ -1,0 +1,154 @@
+---
+title: "Node labels on trees"
+author: "Azul Carrillo"
+date: "2022-11-03"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Data set the we are working with comes with thw TDbook r package
+
+load the data packages 
+
+```{r}
+library("TDbook")
+library(ggtree)
+library(tidytree)
+
+
+```
+load the data from the data package suing the `data()`
+the data we are loading 
+-tree_boots 
+- df_tip_data 
+-df_ inside_data 
+
+Exercise
+1. What is the class of this three objects
+2. How many elements does `tree_boots` has
+3. How many rows does `df_tip_data` and `df_inode_data` have.
+4. Compare the row numbers of both objects to the lengths of the `$tip.label` and `$node.label` elements of `tree_boots`.
+```{r}
+data("tree_boots", "df_inode_data", "df_tip_data")
+
+tree_boots
+class(tree_boots) #phylo  7 tips and 6 internal nodes.Rooted; includes branch lengths.
+
+df_inode_data
+class(df_inode_data) #data frame 6 rows 6 col 
+nrow(df_inode_data)
+length(df_inode_data)
+
+
+df_tip_data
+class(df_tip_data) #data frame 7 rows 10 col 
+nrow(df_tip_data)
+length(df_tip_data)
+#joining data frameas and the tree 
+library(tidytree)
+colnames(df_bar_data)
+df_tip_data$Newick_label
+tree_boots$tip.label
+#rename Newick_ label
+df_mutate<- mutate(df_tip_data, label = Newick_label)
+colnames(df_mutate)
+tree_joined <- left_join(tree_boots, df_mutate, by = "label")
+
+
+df_tip_data
+
+colnames(df_tip_data)-> my_colnames
+my_colnames
+typeof(my_colnames)#"character"
+is.vector(my_colnames)
+my_colnames[1]<- "column 1 "
+my_colnames[5]
+my_colnames
+my_colnames[10] <- "taxonomy"
+
+colnames(df_tip_data)
+colnames(df_tip_data)[1]<-"label" 
+colnames(df_tip_data)
+tree_joined <- left_join(tree_boots, df_tip_data)
+
+tree_joined
+tree_boots
+
+``` 
+
+```{r}
+tree_joined@phylo
+tree_joined@extraInfo
+```
+##plot node labels 
+```{r}
+df_tip_data
+df_inode_data
+
+```
+
+```{r}
+colnames(df_inode_data) [1]<-"label" 
+tree_data2 <- left_join(tree_boots, df_inode_data)
+tree_data2
+```
+
+```{r}
+ggtree(tree_data2)+
+  geom_tiplab(fontface = "italic")+
+  xlim(0,5) +
+  geom_nodelab(mapping = aes(label = vernacularName, color = vernacularName))
+  
+  
+```
+
+
+```{r}
+portal_tree <-("../raw-data/portal-tree.tre")
+```
+
+```{r}
+taxonomy <- read.csv("../raw-data/portal-species-taxonomy.csv")
+surveys <- read.csv("../raw-data/surveys.csv")
+species <- read.csv("../raw-data/species.csv")
+```
+
+```{r}
+library(magrittr)
+library(dplyr)
+library(ggtree)
+library(tidytree)
+surveys %>%
+  filter(!is.na(weight)) %>%
+  group_by(species_id) %>%
+  summarise(mean_weight = mean(weight)) -> species_weight
+
+surveys %>%
+  filter(!is.na(hindfoot_length))%>%
+  group_by(species_id) %>%
+  summarise(mean_hindfoot_length =mean(hindfoot_length)) -> species_hindfoot_length
+
+average_data <- full_join(species_weight, species_hindfoot_length)
+head(average_data)
+#joined both averages and the taxonomy 
+taxonomy_average<- full_join(taxonomy, average_data)
+colnames(taxonomy_average)
+library(dplyr)
+portal_tree <-read.tree("../raw-data/portal-tree.tre")
+portal_joined <- left_join(portal_tree, taxonomy_average)
+```
+
+
+```{r}
+colnames(portal_joined)
+
+ggtree(portal_joined)+
+  geom_tiplab( fontface = "italic",size= 4) +
+  xlim(0,20) +
+  geom_nodelab()
+```

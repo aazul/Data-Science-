@@ -21,9 +21,15 @@ library(ape)
 ```
 
 ```{r}
-portal_tree <- read.tree(file = "../raw-data/portal-tree.tre")
-portal_tree
+portal_tree <-read.tree("../raw-data/portal-tree.tre")
 ```
+
+```{r}
+taxonomy <- read.csv("../raw-data/portal-species-taxonomy.csv")
+surveys <- read.csv("../raw-data/surveys.csv")
+species <- read.csv("../raw-data/species.csv")
+```
+
 branch length Dna- will be propotional to mutation rate by some unit of time, change in DNA per kind 
 
 ```{r}
@@ -38,15 +44,15 @@ length(portal_tree) # gives the number of
 names(portal_tree)
 #portal_tree$Nnode
 head(portal_tree["tip.label"])
-head(portal_tree[[3]])
+head(portal_tree)
 summary(portal_tree)
 str(portal_tree) # $ to access elements
-head(portal_tree$edge)
+head(portal_tree)
 ```
 list is similar to a data frame but it allows combining object of any kind 
 
 ```{r}
-plot.phylo(x = portal_tree)
+#plot.phylo(x = portal_tree)
 ```
 An extension of gg plt for phylogenetic visualization `ggtree`
 to install packages from Bioconductor repo we need a CRAN package called BiocManager
@@ -58,6 +64,8 @@ library(ggtree)
 ```
 Plotting a Phylogenetic tree 
 ```{r}
+library(ggtree)
+portal_tree <-read.tree("../raw-data/portal-tree.tre")
 ggtree(portal_tree)
 ```
 
@@ -113,7 +121,7 @@ add a limit to the plot so that we can see the labels
 ggtree(portal_tree) +
   geom_treescale() +
   geom_tiplab(size = 1, color= "purple", fontface = "italic") +
-  xlim(NA, 90)
+  xlim(NA, 20)
 ```
 
 ```{r}
@@ -179,7 +187,7 @@ taxonomy<- read.csv("../raw-data/portal-species-taxonomy.csv")
 ```{r}
 write.csv(taxonomy, file ="../raw-data/portal-species-taxonomy.csv", row.names = FALSE)
 nrow(taxonomy)
-View(taxonomy)
+
 ```
 
 ```{r}
@@ -209,7 +217,14 @@ tip_labels_cleaned
 portal_tree[["tip.label"]]<-tip_labels_cleaned
 portal_tree$tip.label
 ```
+```{r}
+portal_tree <- read.tree("../raw-data/portal-tree.tre")
 
+```
+
+```{r}
+taxonomy <- read.csv("../raw-data/portal-species-taxonomy.csv")
+```
 
 ```{r}
 library(tidytree)
@@ -222,7 +237,7 @@ color by a variable in our column
 ggtree(tr= tree_data, mapping = aes(color= taxa))+
   geom_tiplab(size = 2, frontface="italic")+
   xlim(0,100)
-ggsave(filename = "../fig/portal-tree-1.png")
+ggsave(filename = "../visuals/portal-tree-1.png")
 
 ```
 
@@ -236,7 +251,7 @@ portal_tree
 ```
 
 ```{r}
-portal_tree <-("../raw-data/portal-tree.tre")
+portal_tree <-read.tree("../raw-data/portal-tree.tre")
 ```
 
 ```{r}
@@ -252,9 +267,10 @@ ggtree(tr= tree_data, mapping = aes(color= taxa)) +
   geom_tiplab(size = 2.5, frontface="italic") +
   xlim(0,100)
 
-ggsave(filename = "../fig/portal-tree-1.png")
+ggsave(filename = "../visuals/portal-tree-1.png")
 tree_data
 ```
+Ex for the hw 
 ```{r}
 small_tree <- read.tree(file = "http://ape-package.ird.fr/APER/APER2/primfive.tre")
 branching.times(small_tree)
@@ -263,15 +279,16 @@ ggtree(small_tree) +
   xlim(0,1.5) +
   geom_tiplab(fontface = "italic")
 
-label <- small_tree$tip.label
+label <- small_tree$tip.label[1:2]
 
 taxa <- c("Hominini", "Hominidae") 
 common_name <- c("Human", "Orangutan")
-data.frame ("label", "taxa", "common_name")
+
+data.frame(label, taxa, common_name)
 ``` 
 
 ```{r}
-install.packages("TDbook")
+#install.packages("TDbook")
 ```
 
 ```{r}
@@ -348,4 +365,84 @@ ggtree(tree_join) +
   geom_tiplab(fontface = "italic", size = 2) +
   xlim(0, 20) +
   geom_tippoint(mapping = aes(shape =  "circle", size = mean_weight, color = taxa))
+getwd()
+```
+Homework for 11/03/2022
+```{r}
+#1 here i obtained the average weight and hindfoot length and filtered all na values 
+surveys %>%
+  filter(!is.na(weight)) %>%
+  group_by(species_id) %>%
+  summarise(mean_weight = mean(weight)) -> species_weight
+
+surveys %>%
+  filter(!is.na(hindfoot_length))%>%
+  group_by(species_id) %>%
+  summarise(mean_hindfoot_length =mean(hindfoot_length)) -> species_hindfoot_length
+
+#2  Create a new data frame that contains the taxonomy data plus the averaged data per species that you got on last question.
+average_data <- full_join(species_weight, species_hindfoot_length)
+head(average_data)
+#joined both averages and the taxonomy 
+taxonomy_average<- full_join(taxonomy, average_data)
+taxonomy_average
+
+# joined the tree and the data frame with the taxonomy and the averages 
+joined_data  <- left_join(portal_tree, taxonomy_average, by = "label")
+
+joined_data
+
+#3 Create two plots with data on the tips, one with the average weight and the other with average hindfoot length. Make sure to also add tip labels, formatted in italics.
+ggtree(joined_data) +
+  geom_tiplab(fontface = "italic", size = 2) +
+  xlim(0, 20) +
+  geom_tippoint(mapping = aes(shape =  "circle", size = mean_weight, color = taxa))
+```
+
+```{r}
+#plot 2 with the mean hindfoot 
+ggtree(joined_data) +
+  geom_tiplab(fontface = "italic", size = 2) +
+  xlim(0, 20) +
+  geom_tippoint(mapping = aes(shape =  "circle", size = mean_hindfoot_length, color = taxa))
+```
+Homework for 10/27/2022
+#A taxonomy table for small_tree
+1. Find the appropriate scientific group labels for each genus in small_tree using this tree as guide
+2. Create a data frame with 3 columns:
+- a "label" column with the names of the tip labels of small_tree.
+- a "taxa" column with the scientific names of the group that each genus belongs to.
+- a "common_name" column with the common names of the group that each genus belongs to.
+3. Join your tree and your table
+4. Create two different tree plots using taxa and common name to color the tips of the tree.
+
+```{r}
+#1
+small_tree <- read.tree(file = "http://ape-package.ird.fr/APER/APER2/primfive.tre")
+#2 creating a data frame with 3 columns 
+label <- small_tree$tip.label
+taxa <- c("Hominini", "Hominidae","Macaques","Atelidae", "Galagidae")
+common_name <- c("Human", "Orangutan","Macaque","Spider Monkey", "Galagos")
+#data frame is created
+Etymology <- data.frame(label, taxa, common_name)
+
+#3joining the tree and the data frame by label using left_join
+full_join  <- left_join(small_tree, Etymology, by = "label")
+
+```
+#4 Create two different tree plots using taxa and common name to color the tips of the tree.
+```{r}
+#4.1
+ggtree(full_join) +
+  geom_tiplab(fontface = "italic", size = 5) +
+  xlim(0, 2) +
+  geom_tippoint(mapping = aes(shape =  "circle",size = taxa, color = taxa))
+```
+
+```{r}
+#4.2
+ggtree(full_join) +
+  geom_tiplab(fontface = "italic", size = 5) +
+  xlim(0, 2) +
+  geom_tippoint(mapping = aes(shape =  "circle",size = common_name, color = common_name))
 ```
