@@ -1,0 +1,155 @@
+---
+title: "functions-prep.Rmd"
+author: "Azul Carrillo"
+date: "2022-11-08"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Writing our own functions in r
+
+-   allows us to understand code without understanding all of the details
+
+```{r}
+sum(c(1,2,3))
+funtion_name <- function(inputs) {
+  output_value <- do_something (inputs)
+  return(output_value)
+}
+
+{
+  a = 2 
+  b = 3 
+  a + b 
+  
+}
+
+```
+
+creating a function - define the instructions for a calculation haven't actually used it
+
+```{r}
+calc_shrub_vol <- function(length, width, height) {
+  area <- length * width 
+  volume <-  area * height 
+  return(volume)
+}
+
+```
+
+running our function
+
+```{r}
+calc_shrub_vol(0.8, 1.6, 2.0 )
+shrub_vol <-  calc_shrub_vol(0.8, 1.6, 2.0) # storing the output in our function so that we can use it later 
+```
+
+2.  how to treat functions as black boxes - function should only know the inputs we pass arguments\
+    the program should not Khow anything that goes in the function but the output that the function passes back down to it
+
+```{r}
+shrub_vol <-  calc_shrub_vol(0.8, 1.6, 2.0)
+```
+3. setting different values for arguments 
+- recreating a function height=1
+setting defaults to our functions 
+```{r}
+calc_shrub_vol <- function(length, width, height = 1) {
+  area <- length * width 
+  volume <-  area * height 
+  return(volume)
+}
+calc_shrub_vol(0.8, 1.6, 2.0 )
+calc_shrub_vol(0.8, 1.6) # since we gave a height a default value of 1 when the height is not specifyed itll be a value of 1
+
+```
+4. When To Use Named And Unnamed Arguments
+pos based for things that are required 
+named arg things ghat are optional 
+only exeption is when we might get confused 
+```{r}
+calc_shrub_vol(length = 0.8 , width = 1.6, height = 2.0)
+calc_shrub_vol(height = 2.0, length = 0.8 , width = 1.6) #order doesnt matter when named 
+calc_shrub_vol(0.8 ,  1.6, height = 2.0)
+```
+
+5. combining functions 
+
+```{r}
+library(dplyr)
+calc_shrub_vol <- function(length, width, height = 1) {
+  area <- length * width 
+  volume <-  area * height 
+  return(volume)
+}
+
+est_shrub_mass <- function(volume) {
+  mass <- 2.65 * volume^0.9 
+  return(mass)
+}
+#combine the two functions 
+shrub_volume <- calc_shrub_vol(0.8, 1.6, 2.0)
+shrub_mass <- est_shrub_mass(shrub_vol)
+
+
+#or use pipes 
+shrub_mass <- calc_shrub_vol(0.8, 1.6, 2.0) %>%
+  est_shrub_mass()
+
+#nest functions together can make cose difficult to read 
+shrub_mass <- est_shrub_mass(calc_shrub_vol(0.8, 1.6, 2.0))
+```
+6. Calling Functions Inside Of Other Functions
+
+we should never assume that variables from the outter program are avaliable inside of a function but we can allways assume that finctions that are avaliable in the outter program are avaliable to functions to do calculations with 
+```{r}
+calc_shrub_vol <- function(length, width, height = 1) {
+  area <- length * width 
+  volume <-  area * height 
+  return(volume)
+}
+
+est_shrub_mass <- function(volume) {
+  mass <- 2.65 * volume^0.9 
+  return(mass)
+}
+
+est_shrub_dim <- function(length, width, height = 1){
+  volume <- calc_shrub_vol(length, width, height)
+  mass <- est_shrub_mass(volume)
+  return(mass)
+}
+est_shrub_dim(0.8, 1.6, height = 2.0)
+```
+7. tips and tricks 
+navagation menu 
+collapse and expang 
+change settings to diferentiate between functions and variables 
+```{r}
+calc_shrub_vol <- function(length, width, height = 1) {
+  area <- length * width 
+  volume <-  area * height 
+  return(volume)
+}
+
+est_shrub_mass <- function(volume) {
+  mass <- 2.65 * volume^0.9 
+  return(mass)
+}
+
+est_shrub_dim <- function(length, width, height = 1){
+  volume <- calc_shrub_vol(length, width, height)
+  mass <- est_shrub_mass(volume)
+  return(mass)
+}
+
+```
+
+
