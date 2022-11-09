@@ -1,0 +1,92 @@
+---
+title: "Creating functions"
+author: "Azul Carrillo"
+date: "2022-11-08"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Intro to creating functions 
+Why is it good to create functions - 
+create more columns in a data frame with a specfic req
+creating functions can help you understand and be able to make changes in order to obtain the desired output stay organized 
+copy and pasting is very error prone 
+
+```{r}
+convert_pounds_to_grams <- function(pounds) {
+    grams = 453.6 * pounds
+    return(grams)
+}
+```
+
+```{r}
+convert_pounds_to_grams <- function(pounds) {
+   grams= 453.6 * pounds
+    return(grams)
+}
+#convert_pounds_to_grams() #says value is missing 
+convert_pounds_to_grams(3.75)
+convert_pounds_to_grams(pounds = 3.75)
+
+
+```
+
+```{r}
+get_mass_from_length_theropoda <- function(length){
+  mass <- 0.73 * length ^ 3.63
+  return(mass)
+}
+get_mass_from_length_theropoda(16) #17150.56
+```
+
+```{r}
+get_mass_from_length <- function(length){
+  mass <- 214.44 * length ^ 1.46
+  return(mass)
+}
+get_mass_from_length(26)#24955.54kg
+```
+
+```{r}
+get_mass_from_length <- function(length, a = 39.9, b = 2.6 ){
+  mass <- a * length ^ b
+  return(mass)
+}
+get_mass_from_length(length=22,a = 214.44, b = 1.46)#19554.33
+```
+
+```{r}
+get_mass_from_length <- function(length, a = 39.9, b = 2.6 ){
+  mass <- a * length ^ b
+  return(mass)
+}
+get_mass_from_length(length=16) # 53911.93
+```
+Write a function called convert_kg_to_pounds that converts kilograms into pounds (pounds = 2.205 * kg).
+Use that function and your get_mass_from_length() function from Default Arguments to estimate the weight, in pounds, of a 12 m long Stegosaurus with a = 10.95 and b = 2.64 (The estimated a and b values for Stegosauria from Seebacher 2001).
+```{r}
+get_mass_from_length <- function(length, a = 39.9, b = 2.6 ){
+  mass <- a * length ^ b
+  return(mass)
+}
+
+convert_kg_to_pounds <- function(kg){
+ pounds <- 2.205 * kg
+  return(pounds)
+}
+
+library(dplyr)
+weight_in_lbs <- get_mass_from_length(12, 10.95, 2.64) %>%
+  convert_kg_to_pounds() #17055.37
+weight_in_lbs
+
+convert_kg_to_pounds(5)
+```
+
+```{r}
+
+```
