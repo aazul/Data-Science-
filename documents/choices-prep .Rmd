@@ -1,0 +1,124 @@
+---
+title: "choices-prep"
+author: "Azul Carrillo"
+date: "2022-11-10"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#1  Introduction To Conditional Statements.
+use to check if some condition is true or not used to subset data in vectors 
+
+```{r}
+
+"aang" == "aang"
+"aang" == "kora"
+"aang" != "Kora"
+10<5
+10 >= 5
+is.na("toph")
+
+"zuko" %in% c("aang", "toph", "katara" )
+"zuko" %in% c("aang", "toph", "katara", "zuko")
+
+5>2 & 6 >= 10 
+
+5 >2 | 6 >= 10 
+
+c(1, 1, 2, 3, 1) == 1
+
+site = c('a', 'b' , 'c', 'd')
+state = c('FL','FL', 'GA', 'AL')
+
+state == 'FL'
+site [state == 'FL'] #sites in which the state is FL  
+site [c(TRUE,  TRUE, FALSE, FALSE)]
+
+```
+#2 Introduction To if Statements In R.
+```{r}
+#if(the conditional statement is TRUE) {
+#  do something 
+#}
+
+x = 4
+if (x > 5){
+  x = x^2 
+} # not a function 
+
+#estimating the biomass of a plant based on the value we measured in the field 
+
+veg_type = "tree"
+volume = 16.8 
+
+if (veg_type == "tree"){
+  mass = 2.65 * volume^0.9
+}
+```
+#3 Introduction To else if And else Statements in R.
+```{r}
+veg_type = "tree"
+volume = 16.08 
+
+if (veg_type == "tree"){
+  mass = 2.65 * volume^0.9
+} else if (veg_type == "grass"){
+  mass = 0.65 * volume^1.2 
+}
+
+veg_type = "shrub"
+volume = 16.08 
+
+if (veg_type == "tree"){
+  mass = 2.65 * volume^0.9
+} else if (veg_type == "grass"){
+  mass = 0.65 * volume^1.2 
+} else {
+ mass = NA 
+}
+
+# allows us to add different conditions 
+```
+#4 Using if/else if/else Statements Inside of Functions in R.
+```{r}
+est_mass = function(volume, veg_type) {
+  if (veg_type == "tree"){
+  mass = 2.65 * volume^0.9
+  } else if (veg_type == "grass"){
+    mass = 0.65 * volume^1.2 
+    } else {
+      mass = NA 
+    } 
+  return(mass)
+}
+
+# using the function 
+est_mass(1.6, "tree")
+est_mass(1.6, "grass")
+est_mass(1.6, "shrub")
+```
+#5 Introduction To Nested if Statements in R
+```{r}
+est_mass = function(volume, veg_type, age) {
+  if (veg_type == "tree"){
+    if (age < 5){
+      mass = 1.6 * volume^0.8 
+    }else {
+      mass = 2.65 * volume^0.9
+    }
+  } else if (veg_type == "grass"){
+    mass = 0.65 * volume^1.2 
+    } else {
+      mass = NA 
+    } 
+  return(mass)
+}
+est_mass(1.6, "tree", 4 )
+est_mass(1.6, "tree", 6 )
+est_mass(1.6, "grass")
+est_mass(1.6, "shrub")
+```
