@@ -1,0 +1,113 @@
+---
+title: "functions-after"
+author: "Azul Carrillo"
+date: "2022-11-10"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# A function for the Portal data set
+
+1. loading the needed data into r with the read.csv func and asigning it a name 
+
+```{r}
+surveys <- read.csv(file = "../raw-data/surveys.csv")
+species <- read.csv(file = "../raw-data/species.csv")
+plots <- read.csv(file = "../raw-data/plots.csv") 
+```
+2. first loading that package that has the inner join function so that it can be used combined the survey and species tables into a single data frame using the inner_join function joined them by species 
+```{r}
+library(dplyr)
+surveys_species <- inner_join(surveys, species, by = "species_id")
+```
+
+need the col names in order to add the correct argument 
+```{r}
+colnames(surveys_species)
+
+```
+3. Write a function that:
+Takes three arguments - a data frame (the combined table created before), a genus name, and a species name,
+Uses functions from the dplyr package to produce a data frame with two columns: year and count, where count is the number of individuals (i.e., the number of rows) for the species indicated by genus and species in that year,
+Returns the resulting data frame. Note that this data frame is a time series by year.
+
+gives info for all genus adn all years but addind the filter it changes it 
+```{r}
+library(dplyr)
+func_1 <- function(surveys_species, genus , species){
+results <- surveys_species %>%
+  group_by(year, genus, species) %>%
+  summarise(count = n())
+  return(results[ ,c("year", "count")])
+}
+
+results <- surveys_species %>%
+  group_by(year, genus, species) %>%
+  summarise(count = n())
+  
+
+results[ ,c("year", "count")]
+```
+#try 2 
+added the filter to the function to specify what we want from the genus column and the species column 
+removed the subsetting at the return function because it was cousing an issue in the output gruped only by year using the group_by 
+```{r}
+library(dplyr)
+func_2 <- function(combined, genus_name , species_name){
+results <- combined %>%
+  filter(genus == genus_name , species == species_name) %>%
+  group_by(year) %>%
+  summarise(count = n())
+  return(results)
+}
+
+head(surveys_species)
+```
+
+running a pipe befor creating the function to see that our function is doing the correct command 
+```{r}
+results <- surveys_species %>%
+  filter(genus == "Dipodomys", species == "merriami" ) %>%
+  group_by(year) %>%
+  summarise(count = n())
+
+
+```
+#4
+creating a new object that uses our function to create a time series for  the genus "Dipodomys" and species "merriami"
+```{r}
+plot1 <- func_2(surveys_species, "Dipodomys", "merriami")
+plot1
+```
+#5
+creating a new object that uses our function to create a time series for  the genus "Chaetodipus" species "penicillatus"
+```{r}
+plot2 <- func_2(surveys_species, "Chaetodipus", "penicillatus")
+plot2
+```
+#4
+time-series plot of genus Chaetodipus and species
+```{r}
+library("ggplot2")
+ggplot(data = plot1, mapping = aes(x = year, y = count)) + 
+  geom_point() +
+  labs(x = "Year", y = "Count", title = " Timed series for Genus: Dipodomys | Species: merriami")
+```
+#5 
+time-series plot of genus Chaetodipus and species penicillatus
+added color to the plots using the color func and a size of 1 using the size func
+added labels using labs 
+added a line that connects the plots using geom_ line func 
+ 
+```{r}
+library("ggplot2")
+ggplot(data = plot2, mapping = aes(x = year, y = count)) + 
+  geom_point(color = "blue", size = 1 ) +
+  geom_line(color="blue" ) +
+  labs(x = "Year", y = "Number of Individuals", title = " Timed series for Genus: Chaetodipus | Species: penicillatus")
+
+```
