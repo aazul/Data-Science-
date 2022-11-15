@@ -1,0 +1,131 @@
+---
+title: "apply-prep"
+author: "Azul Carrillo"
+date: "2022-11-15"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Reusing code - Apply function - The apply family of functions
+
+Introduction to repeating things in R.
+```{r}
+est_mass <- function(volume) { 
+  mass <- 2.65 * volume^0.9
+  return(mass)
+}
+
+est_mass(1.6)
+est_mass(5.6)
+
+
+```
+
+Using vectorized functions.
+```{r}
+c(1, 2, 3) * 2 #element wise calc 
+volumes <- c( 1.6, 5.6, 3.1)
+est_mass(volumes)
+
+library(stringr)
+
+str_to_sentence(c("dipodomys", "chaetodipus")) # capitalazes the first letter of a sentence 
+genus <- c("dipodomys", "chaetodipus", "dipodomys")
+species <- c("ordii","baileyi","spectabilis")
+
+combined_genus_species <- function(genus, species){
+  genus_cap <-  str_to_sentence(genus)
+  genus_species <- paste(genus_cap, species)
+  return(genus_species)
+}
+combined_genus_species(genus, species)
+data <- data.frame(genus, species)  
+combined_genus_species(data$genus, data$species)
+```
+
+Apply functions
+```{r eval = FALSE}
+#apply the function to each item in the vector and return a vector or list of th e same size this doesnt recure that the calc work on vectors 
+est_mass <- function(volume) { 
+  if(volume > 5 ){
+   mass <- 2.65 * volume^0.9 
+  } else { mass <- NA
+    }
+  return(mass)
+}
+volumes <- c( 1.6, 5.6, 3.1)
+est_mass(volumes)
+sapply(volumes, est_mass) # first argument is a single vector that has the volume and the second argument is the function we want to apply to the vector 
+
+#what the above sapply is doing under the surface 
+c(est_mass(volumes[1]), est_mass(volumes[2]), est_mass(volumes[3]))
+```
+
+The mapply function For Functions with Multiple Vector Arguments
+```{r}
+est_mass <- function(volume, veg_type) { 
+  if(veg_type == "tree" ){
+   mass <- 2.65 * volume^0.9 
+  } else { mass <- NA
+    }
+  return(mass)
+}
+volumes <- c( 1.6, 5.6, 3.1)
+veg_type <- c("shrub", "tree", "tree")
+#function is the firat argument, the name of the argument = the name our vectoror object in the outter program , for veg type theyre both name hte same 
+mapply(FUN = est_mass, volume = volumes, veg_type = veg_type)
+mapply(est_mass, volumes, veg_type)
+```
+ 
+Combining functions with dplyr - every row in a data frame  or for every group by using group by 
+
+to repeat things once for esch row to create new columns we use mutate 
+if func is not vectorized we need to add rowwide 
+we can repeat things by using group by 
+```{r}
+library(dplyr)
+est_mass <- function(volume, veg_type) { 
+  if(veg_type == "tree" ){
+   mass <- 2.65 * volume^0.9 
+  } else { mass <- NA
+    }
+  return(mass)
+}
+volumes <- c( 1.6, 5.6, 3.1)
+veg_type <- c("shrub", "tree", "tree")
+plant_data <- data.frame (volumes, veg_type)
+
+est_mass_vectorized <- function(volume){
+  mass <- 2.65 * volume^0.9 
+  return(mass)
+}
+
+plant_data %>%
+  mutate(masses = est_mass_vectorized(volumes))
+
+#working with non vectorized functions this wont work unless uyou add rowwise function 
+plant_data %>%
+  rowwise() %>%
+  mutate(masses = est_mass(volumes, veg_type))
+
+
+get_biomass <-  function(volumes) {
+  masses <- est_mass_vectorized(volumes)
+  biomass <- sum(masses)
+  return(biomass)
+}
+get_biomass(volumes)
+
+plant_data%>%
+  group_by(veg_type)%>%
+  summarize(biomass= get_biomass(volumes))
+
+```
+
+```{r}
+```
