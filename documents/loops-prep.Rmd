@@ -1,0 +1,91 @@
+---
+title: "loops-prep"
+author: "Azul Carrillo"
+date: "2022-11-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Basic For Loops in R
+```{r, eval = FALSE}
+for (item in list_of_items){
+  do_something(item)
+}
+volumes <- c(1.6,3,8)
+for (volume in volumes){
+  mass <- 2.65 * volume^0.9 
+  print(mass)
+}
+
+volume <- volumes[1]
+mass <-  2.65 * volume^0.9 
+print(mass)
+volume <- volumes[2]
+mass <-  2.65 * volume^0.9 
+print(mass)
+volume <- volumes[3]
+mass <-  2.65 * volume^0.9 
+print(mass)
+```
+#Looping By Index
+```{r}
+volumes <- c(1.6,3,8) # i is short for index
+masses <-  vector(length = length(volumes), mode = "numeric")
+for (i in 1:length(volumes)){
+  mass <- 2.65 * volumes[i]^0.9 
+ masses[i] <- mass
+}
+
+
+
+```
+#Looping Over Multiple Objects
+```{r}
+volumes <- c(1.6,3,8) 
+b0 <-  c(2.65, 1.28, 3.29)
+b1 <-  c(0.9, 1.1, 1.2)
+masses <-  vector(length = length(volumes), mode = "numeric")
+for (i in 1:length(volumes)){
+  mass <- 2.65 * volumes[i]^b1[i] 
+ masses[i] <- mass
+}
+```
+#Looping Using Functions
+```{r}
+est_mass <- function (volume){
+  if (volume > 5) {
+    mass <- 2.65 * volume ^ 0.9
+    }else {
+    mass <-  NA
+    }
+    return(mass)
+}
+
+volumes = c(1.6, 3, 8)
+masses <- vector(mode = "numeric",  length = length(volumes))
+for (i in 1:length(volumes)) {
+  mass <-  est_mass(volumes[i])
+  masses[i] <- mass
+}
+  
+masses_apply <- sapply(volumes, est_mass)
+```
+#Looping Over Files
+```{r}
+download.file("https://www.datacarpentry.org/semester-biology/data/locations.zip", "locations.zip")
+unzip("locations.zip")
+
+data_files<- list.files(pattern = "locations-")
+results<- vector(mode = "integer", length(data_files)) 
+for(i in 1:length(data_files)){
+  data <-  read.csv(data_files[i])
+  count <- nrow(data)
+  results[i] <- count
+}
+  
+
+
+
+```
