@@ -1,0 +1,170 @@
+---
+title: "loops"
+author: "Azul Carrillo"
+date: "2022-11-17"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+sum (1, 2, 3, 4, 5)
+```
+
+```{r}
+numbers <- c(1, 2, 3, 4, 5)
+numbers <- 1:5
+numbers <- seq(1,5,0.3)
+
+for (number in numbers){
+  print(number)
+}
+```
+
+```{r}
+mass_lbs <- c(2.2, 3.5, 9.6, 1.2)
+for(numbers in mass_lbs){
+  mass_kg = 2.2 * numbers
+  print(mass_kg)
+}
+
+```
+
+```{r}
+our_names <- c("Azul","jai", "marcos", "luna")
+for (names in our_names) {
+  print(names)
+}
+```
+
+```{r}
+birds <-  c('robin', 'woodpecker', 'blue jay', 'sparrow')
+for (i in 1:length(birds)){
+  print(birds[i])
+}
+```
+
+```{r}
+radius <- c(1.3, 2.1, 3.5)
+areas <- vector(mode = "numeric", length = length(radius))
+for ( i in 1:length(radius)){
+  areas[i] <- pi * radius[i] ^ 2
+}
+areas
+```
+
+```{r}
+lengths = c(1.1, 2.2, 1.6)
+widths = c(3.5, 2.4, 2.8)
+areas <- vector(length = length(lengths), mode = "numeric")
+for (i in 1:length(areas)) {
+  areas[i] <- lengths[i] * widths[i]
+}
+areas
+```
+#Size Estimates By Name Loop
+```{r}
+dinosaur_lengths <- read.csv("../raw-data/dinosaur_lengths.csv")
+head(dinosaur_lengths)
+```
+
+```{r}
+mass_from_length <- function(lengths, species){
+  mass <- a * length^b
+ if (name == "Stegosauria") {
+     a <- 10.95 
+     b <- 2.64 
+   } else if (name == "Theropoda") {
+     a <- 0.73
+     b <- 3.63
+   } else if (name == "Sauropoda") {
+     a <- 214.44
+     b <- 1.46
+ } else {
+   a <- 25.37
+   b <- 2.49
+  }
+     return(mass)
+}
+  
+```
+
+```{r, eval = FALSE}
+library(dplyr)
+
+
+dinosaur_lengths <- read.csv("../raw-data/dinosaur_lengths.csv")
+head(dinosaur_lengths)
+dinosaur_lengths%>%
+  rowwise() %>%
+  mutate(masses = mass_from_length(lengths, species))
+
+mass_from_length <- function(lengths, species){
+ if (species == "Stegosauria") {
+     a <- 10.95 
+     b <- 2.64 
+   } else if (species == "Theropoda") {
+     a <- 0.73
+     b <- 3.63
+   } else if (species == "Sauropoda") {
+     a <- 214.44
+     b <- 1.46
+ } else {
+   a <- 25.37
+   b <- 2.49
+ }
+   mass <- a * length ^ b
+     return(mass)
+}
+
+library(dplyr)
+
+lengths <- dinosaur_lengths$lengths
+lengths
+species <- dinosaur_lengths$species
+species
+
+
+dino_masses <- vector(length = length(lengths), mode = "numeric")
+
+for (i in 1:length(species)){
+  dino_masses[i] <- mass_from_length(lengths[i], species[i])
+}
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+download.file("http://www.datacarpentry.org/semester-biology/data/individual_collar_data.zip", "collar.zip")
+unzip("collar.zip")
+collar_data_files <- list.files(pattern = "collar-")
+collar_data_files
+min_results <- vector(mode = "integer", length(collar_data_files)) 
+max_results <- vector(mode = "integer", length(collar_data_files)) 
+
+
+for(i in 1:length(collar_data_files)){
+  filename <- collar_data_files[i]
+  data <- read.csv(filename) 
+  data %>%
+    ggplot(aes(x = long, y = lat )) +
+    labs(title = filename) +
+  geom_path() -> plots
+    print(plots) 
+   min_results[i] <- min(data$lat)
+   max_results[i] <- max(data$lat)
+}
+
+```
+
+
+```{r}
+min_max_data <- data.frame(collar_data_files, min_results, max_results)
+
+min_max_data
+```
+
