@@ -2,7 +2,9 @@
 title: "loops-prep"
 author: "Azul Carrillo"
 date: "2022-11-17"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
