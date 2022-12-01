@@ -95,13 +95,83 @@ reading_csv <- function(file_name, file_link) {
 reading_csv(file_name = "species.csv", 
             file_link = "https://ndownloade.figshare.com/files/3299483")
 ```
+#Exercise 2: Multi-file Analysis
+
+##1. If individual_collar_data.zip is not already in your working directory download the zip file using download.file()
+
+##2. Unzip it using unzip()
+
+##3. Obtain a list of all of the files with file names matching the pattern "collar-data-.*.txt" (using list.files())
+
+```{r}
+library(dplyr)
+library(ggplot2)
+collar_data_files <- list.files(pattern = "collar-")
+collar_data_files
+```
+
+##4. Use a loop to load each of these files into R and make a line plot (using geom_path()) for each file with long on the x axis and lat on the y axis. Graphs, like other types of output, won’t display inside a loop unless you explicitly display them, so you need put your ggplot() command inside a print() statement. Include the name of the file in the graph as the graph title using labs().
+
+##5. Add code to the loop to calculate the minimum and maximum latitude in the file, and store these values, along with the name of the file, in a data frame. Show the data frame as output.
+```{r}
+min_results <- vector(mode = "integer", length(collar_data_files)) 
+max_results <- vector(mode = "integer", length(collar_data_files)) 
 
 
+for(i in 1:length(collar_data_files)){
+  filename <- collar_data_files[i]
+  data <- read.csv(filename) 
+  data %>%
+    ggplot(aes(x = long, y = lat )) +
+    labs(title = filename) +
+  geom_path() -> plots
+    print(plots) 
+   min_results[i] <- min(data$lat)
+   max_results[i] <- max(data$lat)
+}
+
+```
+
+#Exercise 3: A function for the UHURU data set
 
 
+##1. Explain what each line of code in the body of the function is doing. Add the explanations to your Rmd file as comments, before each line of code.
 
+```{r}
 
+report_rsquared <- function(data, species, formula){
+  subset <- dplyr::filter(data, ANT == species)
+  test <- lm(formula, data = subset)
+  rsquared <- round(summary(test)$r.squared, 3)
+  output <- data.frame(species = species, r2 = rsquared)
+  return(output)
+}
+```
 
+##2. Execute the function using the UHURU data and specifying species = "CM" and formula = "AXIS1~CIRC".
+```{r}
+UHURU_data <- read.csv(file = "../raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
+
+report_rsquared(UHURU_data,"CM","AXIS1~CIRC")
+```
+
+##3. Modify the function so that it also determines if() the rsquared is significant based on a given threshold. The modified function should return() the species, rsquared and a significance value of "S" for a relationship with an rsquared > threshold or "NS" for an rsquared < threshold.
+```{r}
+report_rsquared_modified <- function(data, species, formula){
+  subset <- dplyr::filter(data, ANT == species)
+  test <- lm(formula, data = subset)
+  rsquared <- round(summary(test)$r.squared, 3)
+  output <- data.frame(species = species, r2 = rsquared)
+  return(output)
+}
+```
+
+##4. Execute your modified function for species of "CM", "CS", and "TP" given a threshold = 0.667.
+```{r}
+```
+
+```{r}
+```
 
 
 
