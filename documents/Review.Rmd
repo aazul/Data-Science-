@@ -106,8 +106,11 @@ reading_csv(file_name = "species.csv",
 ```{r}
 library(dplyr)
 library(ggplot2)
+download.file("http://www.datacarpentry.org/semester-biology/data/individual_collar_data.zip", "collar.zip")
+unzip("collar.zip", exdir = "../raw-data")
 collar_data_files <- list.files(pattern = "collar-")
 collar_data_files
+
 ```
 
 ##4. Use a loop to load each of these files into R and make a line plot (using geom_path()) for each file with long on the x axis and lat on the y axis. Graphs, like other types of output, won’t display inside a loop unless you explicitly display them, so you need put your ggplot() command inside a print() statement. Include the name of the file in the graph as the graph title using labs().
@@ -131,7 +134,66 @@ for(i in 1:length(collar_data_files)){
 }
 
 ```
+```{r}
 
+min_max_data <- data.frame(collar_data_files, min_results, max_results)
+
+min_max_data
+```
+
+##Solution 2 
+```{r}
+all_min <-  vector()
+all_max <- vector()
+length(all_min)
+file_name <- vector()
+
+for(i in collar_data_files){
+  print(i)
+  print(getwd())
+  file_name <- c(file_name,i)
+  collar_data_table <- read.csv(file = i )
+  min_lat <- min (collar_data_table[,"lat"])
+  all_min <- c(all_min,min_lat)
+  max_lat <- max(collar_data_table[,"lat"])
+  all_max <- c(all_max, max_lat)
+  print(all_min)
+  print(all_max)
+}
+
+min_max_dataframe <- data_frame(file_name, all_min, all_max)
+min_max_dataframe
+
+
+
+```
+```{r}
+#solution 3 
+library(stringr)
+all_min_lat <- vector(mode = "integer", length = length(collar_data_files)) 
+all_max_lat <- all_min_lat
+all_file_names <- all_min_lat
+length(all_min)
+length(all_max)
+all_file_names
+
+for (i in 1:length(collar_data_files)){
+  file_name_and_path <- str_c("../raw-data/",collar_data_files[i])
+  all_file_names[i] <- file_name_and_path
+  print(file_name_and_path)
+  collar_data_table <- read.csv(file = file_name_and_path)
+  min_lat <- min(collar_data_table$lat)
+  all_min_lat[i] <- min_lat
+  max_lat <- max(collar_data_table$lat)
+  all_max_lat[i] <- max_lat
+  print(all_min_lat)
+  print(all_max_lat)
+}
+
+min_max_dataframee <- data_frame(all_file_names, all_min_lat, all_max_lat)
+min_max_dataframee
+
+```
 #Exercise 3: A function for the UHURU data set
 
 
@@ -168,6 +230,12 @@ report_rsquared_modified <- function(data, species, formula){
 
 ##4. Execute your modified function for species of "CM", "CS", and "TP" given a threshold = 0.667.
 ```{r}
+
+file_name <-  "individual_collar_data.zip"
+#if (!file_present){
+  #download.file(url = "http://www.datacarpentry.org/semester-biology/data/individual_collar_data.zip", 
+              #  destfile = "../raw-data/individual_collar_data.zip ")
+#}
 ```
 
 ```{r}
