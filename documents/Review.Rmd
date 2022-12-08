@@ -202,10 +202,10 @@ min_max_dataframee
 ```{r}
 
 report_rsquared <- function(data, species, formula){
-  subset <- dplyr::filter(data, ANT == species)
-  test <- lm(formula, data = subset)
-  rsquared <- round(summary(test)$r.squared, 3)
-  output <- data.frame(species = species, r2 = rsquared)
+  subset <- dplyr::filter(data, ANT == species)#subset the ANT row name by a logical condition changing it to species 
+  test <- lm(formula, data = subset) #lm fun stands for linear models is used to fit linear models to data frames 
+  rsquared <- round(summary(test)$r.squared, 3)#round function rounds off values to a specific number of decimal value
+  output <- data.frame(species = species, r2 = rsquared)#creates a data frame from the arguments given and in order for this to be printed at the end of the func it was created into an object 
   return(output)
 }
 ```
@@ -213,34 +213,64 @@ report_rsquared <- function(data, species, formula){
 ##2. Execute the function using the UHURU data and specifying species = "CM" and formula = "AXIS1~CIRC".
 ```{r}
 UHURU_data <- read.csv(file = "../raw-data/ACACIA_DREPANOLOBIUM_SURVEY.txt", sep = "\t")
-
+UHURU_data
 report_rsquared(UHURU_data,"CM","AXIS1~CIRC")
 ```
 
 ##3. Modify the function so that it also determines if() the rsquared is significant based on a given threshold. The modified function should return() the species, rsquared and a significance value of "S" for a relationship with an rsquared > threshold or "NS" for an rsquared < threshold.
 ```{r}
-report_rsquared_modified <- function(data, species, formula){
+report_rsquared_modified <- function(data, species, formula, threshold){
+  if (rsquared > threshold ){
+     print("S")
+} else if (rsquared < threshold)
+   print("NS") 
   subset <- dplyr::filter(data, ANT == species)
   test <- lm(formula, data = subset)
   rsquared <- round(summary(test)$r.squared, 3)
   output <- data.frame(species = species, r2 = rsquared)
-  return(output)
+  threshold <- #Threshold a numeric array or vector
+  return()
 }
+
 ```
 
 ##4. Execute your modified function for species of "CM", "CS", and "TP" given a threshold = 0.667.
 ```{r}
+#report_rsquared(UHURU_data,"CM","AXIS1~CIRC", "0.667")
+#report_rsquared(UHURU_data,"CS","AXIS1~CIRC", "0.667")
+#report_rsquared(UHURU_data,"TP","AXIS1~CIRC", "0.667")
+```
 
-file_name <-  "individual_collar_data.zip"
-#if (!file_present){
-  #download.file(url = "http://www.datacarpentry.org/semester-biology/data/individual_collar_data.zip", 
-              #  destfile = "../raw-data/individual_collar_data.zip ")
-#}
+#Exercise 2: Multi-file Analysis DNA or RNA Iteration
+
+
+Write a function, dna_or_rna(sequence), that determines if a sequence of base pairs is DNA, RNA, or if it is not possible to tell given the sequence provided. Since all the function will know about the material is the sequence the only way to tell the difference between DNA and RNA is that RNA has the base Uracil ("u") instead of the base Thymine ("t"). Have the function return one of three outputs: "DNA", "RNA", or "UNKNOWN".
+
+##1. Use the function and a for loop to print the type of the sequences in the following list.
+##2.Use the function and sapply to print the type of the sequences in the following list.
+
+```{r}
+library(dplyr)
+library(stringr)
+sequences <- c("ttgaatgccttacaactgatcattacacaggcggcatgaagcaaaaatatactgtgaaccaatgcaggcg", "gauuauuccccacaaagggagugggauuaggagcugcaucauuuacaagagcagaauguuucaaaugcau", "gaaagcaagaaaaggcaggcgaggaagggaagaagggggggaaacc", "guuuccuacaguauuugaugagaaugagaguuuacuccuggaagauaauauuagaauguuuacaacugcaccugaucagguggauaaggaagaugaagacu", "gauaaggaagaugaagacuuucaggaaucuaauaaaaugcacuccaugaauggauucauguaugggaaucagccggguc")
+
+dna_or_rna <- function(sequences){
+  if (str_detect(sequences, "u")) {
+ result <-  print("RNA")
+   } else if (str_detect(sequences, "t")) {
+   result <- print("DNA")
+   } else { 
+ result <- print("UNKNOWN")
+  }
+     return(result)
+}
+sapply(sequences, dna_or_rna)
+
 ```
 
 ```{r}
-```
 
+```
 
 
 
