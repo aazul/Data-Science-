@@ -220,28 +220,27 @@ report_rsquared(UHURU_data,"CM","AXIS1~CIRC")
 ##3. Modify the function so that it also determines if() the rsquared is significant based on a given threshold. The modified function should return() the species, rsquared and a significance value of "S" for a relationship with an rsquared > threshold or "NS" for an rsquared < threshold.
 ```{r}
 report_rsquared_modified <- function(data, species, formula, threshold){
-  if (rsquared > threshold ){
-     print("S")
-} else if (rsquared < threshold)
-   print("NS") 
   subset <- dplyr::filter(data, ANT == species)
   test <- lm(formula, data = subset)
   rsquared <- round(summary(test)$r.squared, 3)
+   if (rsquared > threshold ){
+     print("S")
+} else if (rsquared < threshold)
+   print("NS") 
   output <- data.frame(species = species, r2 = rsquared)
-  threshold <- #Threshold a numeric array or vector
-  return()
+  return(output)
 }
 
 ```
 
 ##4. Execute your modified function for species of "CM", "CS", and "TP" given a threshold = 0.667.
 ```{r}
-#report_rsquared(UHURU_data,"CM","AXIS1~CIRC", "0.667")
-#report_rsquared(UHURU_data,"CS","AXIS1~CIRC", "0.667")
-#report_rsquared(UHURU_data,"TP","AXIS1~CIRC", "0.667")
+report_rsquared_modified(UHURU_data,"CM","AXIS1~CIRC", 0.667)
+report_rsquared_modified(UHURU_data,"CS","AXIS1~CIRC", 0.667)
+report_rsquared_modified(UHURU_data,"TP","AXIS1~CIRC", 0.667)
 ```
 
-#Exercise 2: Multi-file Analysis DNA or RNA Iteration
+#Exercise 4: Multi-file Analysis DNA or RNA Iteration
 
 
 Write a function, dna_or_rna(sequence), that determines if a sequence of base pairs is DNA, RNA, or if it is not possible to tell given the sequence provided. Since all the function will know about the material is the sequence the only way to tell the difference between DNA and RNA is that RNA has the base Uracil ("u") instead of the base Thymine ("t"). Have the function return one of three outputs: "DNA", "RNA", or "UNKNOWN".
@@ -267,19 +266,137 @@ dna_or_rna <- function(sequences){
 sapply(sequences, dna_or_rna)
 
 ```
+#Exercise 5:Energy Conversion Challenge
+
+
+1. Write a function with the form convert_energy_units(energy_value, input_unit, output_unit) to convert units between the following energy values:
+
+Joules(J),
+Kilojoules(KJ),
+Calories(CAL),
+and Kilocalories (KCAL; this unit is used for labeling the amount of energy contained in food).
+To write the equations to convert between units, consider the following:
+
+A Kilojoule is 1000 Joules,
+a Calorie is 4.1868 Joules,
+a Kilocalorie is 4186.8 Joules.
 
 ```{r}
+convert_energy_units <- function(energy_value, input_unit, output_unit){
+   if (str_detect(input_unit, "KJ")) {
+     J <- energy_value * 1000
+   } else if (str_detect(input_unit, "CAL")) {
+     J <- energy_value * 4.1868 
+   } else {
+      (str_detect(input_unit, "KCAL"))
+     J <- energy_value * 4186.8
+  }
+     return(J)
+}
+```
+An example of a call to this function would look like:
 
+  energy_in_cal <- 200
+  energy_in_j <- convert_energy_units(energy_in_cal, "CAL", "J")
+  
+2. Test your function by running the example call above.
+```{r}
+energy_in_cal <- 200
+energy_in_j <- convert_energy_units(energy_in_cal, "CAL", "J")
+energy_in_j
+```
+3. If either the input unit or the output unit do not match the four types given above, have the function print - “Sorry, I don’t know how to convert “ + the name of the unit provided.
+```{r}
+convert_energy_units <- function(energy_value, input_unit, output_unit){
+   if (str_detect(input_unit, "KJ")) {
+     J <- energy_value * 1000
+   } else if (input_unit == "CAL") {
+     J <- energy_value * 4.1868 
+     print("CAL")
+   } else if (input_unit == "KCAL") {
+     J <- energy_value * 4186.8
+     print("this should be KCAL")
+   } else { 
+   message("Sorry, I don’t know how to convert", input_unit)
+     return(NA)
+   }
+     return(J)
+}
+
+
+```
+```{r}
+convert_to_J <- function(energy_value, input_unit){
+   if (str_detect(input_unit, "KJ")) {
+     J <- energy_value * 1000
+   } else if (input_unit == "CAL") {
+     J <- energy_value * 4.1868 
+     message("input units are CAL")
+   } else if (input_unit == "KCAL") {
+     J <- energy_value * 4186.8
+     message("input units are KCAL")
+   } else { 
+   message("Sorry, I don’t know how to convert", input_unit)
+    # return(NA)
+     J <- NA
+   }
+     return(J)
+}
+
+```
+4. Use your function to answer the following questions:
+
+a) What is the daily metabolic energy used by a human (~2500 KCALs) in Joules.
+```{r}
+convert_energy_units(2500, "CAL", "J")
+```
+```{r}
+convert_energy_units(2500, "KCAL", "J")
+```
+b) How many times more energy does a common seal use than a human? The common seal uses ~52,500 KJ/day (Nagy et al. 1999). Use the daily human metabolic cost calculated in (4a).
+```{r}
+convert_energy_units(52500, "KCAL", "J")
+```
+c) How many ergs (ERG) are there in one kilocalorie. Since we didn’t include the erg conversion this should trigger our ‘don’t know how to convert’ message.
+```{r}
+convert_energy_units(1, "ERG", "J")
+```
+5. Make the function more efficient, and instead of writing an individual conversion between each of the different units (which requires 12 if statements) you could choose to convert all of the input units to a common scale and then convert from that common scale to the output units. This approach is especially useful if you need to add new units later.
+```{r}
+convert_energy_efficient <- function(energy_value, input_unit, output_unit){
+  #convert input to J 
+ energy_to_J <- convert_energy_units(energy_value, input_unit)
+  #convert J to output unit 
+  message("output unit is", output_unit)
+    if (str_detect(output_unit, "KJ")) {
+     energy <- energy_to_J / 1000
+   } else if (output_unit == "CAL") {
+     energy <- energy_to_J / 4.1868 
+     print("CAL")
+   } else if (output_unit == "KCAL") {
+     energy <- energy_to_J / 4186.8
+     print(str_c("this should be KCAL"))
+   } else { 
+     message("Sorry, I don’t know how to convert", input_unit)
+     print("sorry again")
+     return(NA)
+   }
+
+  return(energy)
+}
 ```
 
 
+```{r}
+convert_energy_efficient(200, "Azul","End of the semester!" )
+```
+
+```{r}
+convert_energy_efficient(1200, "CAL",output_unit = "KCAL" )
+```
 
 
-
-
-
-
-
+#thank you for your patience luna i loved having you a an instructor truly have seen progress in myself can't wait for you to become a professor. Share the news when you do!!!!  <3
 
 
 
